@@ -20,6 +20,7 @@ Volitelná pole:
 | `description` | popis pro vyhledávače a když repo nemá „About“ popis                   |
 | `icon`        | URL ikony (jinak se vygeneruje barevná ikona s iniciálami)             |
 | `featured`    | `true` = zobrazí se jako první v horní poličce                         |
+| `platforms`   | systémy, na kterých appka běží, i když pro ně není soubor v releases (např. Linux a macOS, kde se appka sestavuje ze zdroje). Hodnoty: `windows`, `linux`, `macos`, `android` |
 
 Po pushi GitHub Action web přestaví a stránka appky se objeví i v `sitemap-index.xml`.
 
@@ -27,7 +28,7 @@ Po pushi GitHub Action web přestaví a stránka appky se objeví i v `sitemap-i
 
 - **Releases**: tlačítko „Stáhnout“ podle zařízení návštěvníka vybere správný soubor (`.exe`/`.msi` → Windows, `.apk` → Android, `.dmg` → macOS, `.AppImage`/`.deb` → Linux). Ostatní soubory a starší verze jsou ve výběru verzí; odkaz na konkrétní verzi: `/app/<appka>/?v=v1.2.0`.
 - **Filtr** na úvodní stránce má dvě skupiny: **Android** a **PC** (Windows, Linux, macOS).
-- **Podpora**: na detailu aplikace je u zvolené verze přehled Android / Windows / Linux / macOS. Platforma je podporovaná, pokud má verze v releases soubor pro ni.
+- **Podpora**: na detailu aplikace je u zvolené verze přehled Android / Windows / Linux / macOS. Platforma je podporovaná, pokud má verze v releases soubor pro ni, nebo je uvedená v poli `platforms` (pak je označená „ze zdroje“).
 - **Screenshoty** se berou z obrázků v README (bez badge odznaků).
 - **Popis** se bere z pole „About“ repozitáře na GitHubu.
 - Data se načítají přímo v prohlížeči z GitHub API a ukládají se na 10 minut do `localStorage` (anonymní limit je 60 požadavků/h na IP).

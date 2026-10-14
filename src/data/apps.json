@@ -2,7 +2,7 @@
   { "repo": "https://github.com/OpiKula2877/Advanced-Player", "featured": true },
   { "repo": "https://github.com/OpiKula2877/Financer" },
   { "repo": "https://github.com/OpiKula2877/Sprava-prodeje" },
-  { "repo": "https://github.com/OpiKula2877/Apps" },
+  { "repo": "https://github.com/OpiKula2877/Apps", "platforms": ["windows", "linux", "macos"] },
   { "repo": "https://github.com/OpiKula2877/BubbleVerse" },
   { "repo": "https://github.com/OpiKula2877/Batch-Hra" }
 ]

@@ -1002,6 +1002,20 @@ select {
   color: var(--accent);
   font-weight: 700;
 }
+.support li.source {
+  color: var(--ink);
+  background: var(--surface);
+}
+.support li.source::before {
+  content: '✓';
+  color: var(--muted);
+  font-weight: 700;
+}
+.support li.source small {
+  color: var(--muted);
+  font-size: 0.82em;
+  font-weight: 500;
+}
 .support li.no {
   color: var(--muted);
   border-style: dashed;

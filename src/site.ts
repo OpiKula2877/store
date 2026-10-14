@@ -1,4 +1,5 @@
 import rawApps from './data/apps.json';
+import { PLATFORMS, type Platform } from './lib/platform';
 
 export const SITE = {
   name: 'OpiKula Store',
@@ -20,6 +21,11 @@ interface AppEntry {
   /** Absolute URL of an icon image. Defaults to a generated letter icon. */
   icon?: string;
   featured?: boolean;
+  /**
+   * Systems the app runs on, when they aren't all covered by release files,
+   * e.g. Linux and macOS builds that are made from the source code.
+   */
+  platforms?: Platform[];
 }
 
 export interface App {
@@ -31,6 +37,8 @@ export interface App {
   description?: string;
   icon?: string;
   featured: boolean;
+  /** Declared in apps.json, see AppEntry.platforms. */
+  platforms: Platform[];
   initials: string;
   hue: number;
   lightness: number;
@@ -65,6 +73,9 @@ function lightnessFor(hue: number) {
 export const apps: App[] = (rawApps as AppEntry[]).map((entry, index) => {
   const { owner, repo } = parseRepoUrl(entry.repo);
   const name = entry.name ?? repo.replace(/[-_]+/g, ' ');
+  for (const p of entry.platforms ?? []) {
+    if (!PLATFORMS.includes(p)) throw new Error(`apps.json: unknown platform "${p}" for ${entry.repo}`);
+  }
   return {
     slug: repo.toLowerCase(),
     owner,
@@ -74,6 +85,7 @@ export const apps: App[] = (rawApps as AppEntry[]).map((entry, index) => {
     description: entry.description,
     icon: entry.icon,
     featured: entry.featured ?? false,
+    platforms: PLATFORMS.filter((p) => entry.platforms?.includes(p)),
     initials: initialsOf(name),
     hue: hueAt(index),
     lightness: lightnessFor(hueAt(index)),

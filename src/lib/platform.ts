@@ -10,6 +10,12 @@ export const DESKTOP: Platform[] = ['windows', 'linux', 'macos'];
 export type Group = 'android' | 'pc';
 export const GROUPS: Group[] = ['android', 'pc'];
 
+/** Union of several platform lists, in display order. */
+export function mergePlatforms(...lists: Platform[][]): Platform[] {
+  const set = new Set(lists.flat());
+  return PLATFORMS.filter((p) => set.has(p));
+}
+
 export function groupsOf(platforms: Platform[]): Group[] {
   const groups: Group[] = [];
   if (platforms.includes('android')) groups.push('android');

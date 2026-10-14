@@ -89,6 +89,7 @@ const shelf = [...apps].sort((a, b) => Number(b.featured) - Number(a.featured));
             data-repo={app.repo}
             data-name={app.name}
             data-description={app.description ?? ''}
+            data-declared={app.platforms.join(' ')}
           >
             <a href={localePath(lang, `/app/${app.slug}/`)}>
               <AppIcon app={app} size={64} />

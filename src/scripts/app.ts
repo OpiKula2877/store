@@ -25,6 +25,8 @@ const repoName = root.dataset.repo!;
 const $ = <T extends HTMLElement = HTMLElement>(sel: string) => root.querySelector<T>(sel)!;
 
 const userPlatform = detectPlatform();
+// Platforms declared in apps.json that may have no release file (built from source).
+const declared = (root.dataset.declared ?? '').split(' ').filter(Boolean) as Platform[];
 let ctx: RepoContext = { owner, repo: repoName, branch: 'HEAD' };
 let releases: Release[] = [];
 
@@ -85,20 +87,26 @@ function renderPrimary(rel: Release) {
     } else {
       box.innerHTML = `<a class="btn btn-primary" href="${escapeHtml(rel.zipball_url)}"><span>${escapeHtml(t('app.sourceZip'))}</span></a>`;
     }
-    if (userPlatform && downloadable.length) {
+    if (userPlatform && declared.includes(userPlatform)) {
+      const repoUrl = `https://github.com/${owner}/${repoName}`;
+      hint.innerHTML = `${escapeHtml(t('app.buildHint', { platform: pname(userPlatform) }))} <a href="${escapeHtml(repoUrl)}" target="_blank" rel="noopener">${escapeHtml(t('app.viewSource'))}</a>`;
+      hint.hidden = false;
+    } else if (userPlatform && downloadable.length) {
       hint.textContent = t('app.noMatch', { platform: pname(userPlatform) });
       hint.hidden = false;
     }
   }
 }
 
-/** Which operating systems this version ships a file for. */
+/** Per OS: a file in this version, supported but only from source, or not supported. */
 function renderSupport(rel: Release) {
   const shipped = new Set(rel.assets.map((a) => assetPlatform(a.name)));
   $('[data-support]').innerHTML = PLATFORMS.map((p) => {
-    const ok = shipped.has(p);
-    const missing = ok ? '' : `<span class="sr-only">${escapeHtml(t('app.supportNo'))}: </span>`;
-    return `<li class="${ok ? 'yes' : 'no'}">${missing}${escapeHtml(pname(p))}</li>`;
+    if (shipped.has(p)) return `<li class="yes">${escapeHtml(pname(p))}</li>`;
+    if (declared.includes(p)) {
+      return `<li class="source">${escapeHtml(pname(p))} <small>${escapeHtml(t('app.fromSource'))}</small></li>`;
+    }
+    return `<li class="no"><span class="sr-only">${escapeHtml(t('app.supportNo'))}: </span>${escapeHtml(pname(p))}</li>`;
   }).join('');
   $<HTMLElement>('[data-support-row]').hidden = false;
 }

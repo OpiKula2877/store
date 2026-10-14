@@ -1,6 +1,6 @@
 import { useT, type UiKey } from '../i18n/ui';
 import { GitHubError, getOwnerRepos, getReleases, latestRelease, type Repo } from '../lib/github';
-import { GROUPS, groupsOf, platformsOf, type Group, type Platform } from '../lib/platform';
+import { GROUPS, groupsOf, mergePlatforms, platformsOf, type Group, type Platform } from '../lib/platform';
 import { escapeHtml, formatNumber, formatTime } from '../lib/format';
 
 const lang = document.documentElement.lang === 'cs' ? 'cs' : 'en';
@@ -115,17 +115,21 @@ async function load() {
   const found = new Set<Platform>();
   await Promise.all(
     items.map(async (li) => {
+      // Platforms declared in apps.json, e.g. Linux/macOS builds made from source.
+      const declared = (li.dataset.declared ?? '').split(' ').filter(Boolean) as Platform[];
       try {
         const { data, stale: s } = await getReleases(li.dataset.owner!, li.dataset.repo!);
         stale ||= s;
         const latest = latestRelease(data);
-        const platforms = latest ? platformsOf(latest.assets) : [];
+        const platforms = mergePlatforms(latest ? platformsOf(latest.assets) : [], declared);
         platforms.forEach((p) => found.add(p));
         li.dataset.platforms = platforms.join(' ');
         renderMeta(li, latest?.tag_name ?? null, platforms);
       } catch (err) {
         failed ??= err;
-        renderMeta(li, null, []);
+        declared.forEach((p) => found.add(p));
+        li.dataset.platforms = declared.join(' ');
+        renderMeta(li, null, declared);
       }
       const desc = li.querySelector('[data-field="desc"] .skeleton');
       if (desc) desc.parentElement!.innerHTML = `<span class="muted">${escapeHtml(t('app.noDescription'))}</span>`;
