@@ -1,0 +1,22 @@
+---
+import type { App } from '../site';
+
+interface Props {
+  app: App;
+  size?: number;
+  class?: string;
+  style?: string;
+}
+
+const { app, size = 64, class: className = '', style = '' } = Astro.props;
+---
+
+{
+  app.icon ? (
+    <img class:list={['app-icon', className]} src={app.icon} alt="" width={size} height={size} style={`--size:${size}px;${style}`} />
+  ) : (
+    <span class:list={['app-icon', 'app-icon-gen', className]} style={`--size:${size}px;--h:${app.hue};--l:${app.lightness}%;${style}`} aria-hidden="true">
+      {app.initials}
+    </span>
+  )
+}

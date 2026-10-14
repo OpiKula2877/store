@@ -1,0 +1,10 @@
+{
+  "name": "OpiKula Store",
+  "short_name": "OpiKula Store",
+  "description": "Download apps by OpiKula.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f6fa",
+  "theme_color": "#2b59e8",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

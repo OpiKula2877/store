@@ -1,0 +1,16 @@
+---
+import Base from '../layouts/Base.astro';
+import { useT } from '../i18n/ui';
+
+const t = useT('en');
+const cs = useT('cs');
+---
+
+<Base lang="en" title={t('notFound.title')} description={t('notFound.body')} path="/" noindex>
+  <section class="not-found wrap">
+    <h1>{t('notFound.title')}</h1>
+    <p>{t('notFound.body')}</p>
+    <a class="btn btn-primary" href="/"><span>{t('notFound.cta')}</span></a>
+    <p class="muted" lang="cs">{cs('notFound.title')}. <a href="/cs/">{cs('notFound.cta')}</a></p>
+  </section>
+</Base>

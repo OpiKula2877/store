@@ -1,0 +1,118 @@
+---
+import Base from '../layouts/Base.astro';
+import AppIcon from '../components/AppIcon.astro';
+import { SITE, apps, localePath, type Lang } from '../site';
+import { useT } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useT(lang);
+const home = new URL(localePath(lang), SITE.url).href;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      name: SITE.name,
+      url: home,
+      inLanguage: lang,
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: { '@type': 'EntryPoint', urlTemplate: `${home}?q={search_term_string}` },
+        'query-input': 'required name=search_term_string',
+      },
+    },
+    {
+      '@type': 'ItemList',
+      itemListElement: apps.map((app, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        url: new URL(localePath(lang, `/app/${app.slug}/`), SITE.url).href,
+        name: app.name,
+      })),
+    },
+  ],
+};
+
+const shelf = [...apps].sort((a, b) => Number(b.featured) - Number(a.featured));
+---
+
+<Base lang={lang} title={SITE.name} description={t('home.metaDescription')} path="/" jsonLd={jsonLd}>
+  <section class="hero wrap">
+    <div class="hero-copy">
+      <h1>{t('home.title')}</h1>
+      <p class="lead">{t('home.lead')}</p>
+    </div>
+    <ul class="shelf" aria-label={t('list.heading')}>
+      {
+        shelf.map((app, i) => (
+          <li style={`--i:${i}`}>
+            <a href={localePath(lang, `/app/${app.slug}/`)}>
+              <AppIcon app={app} size={88} />
+              <span>{app.name}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="catalog wrap" aria-labelledby="list-heading">
+    <div class="catalog-head">
+      <h2 id="list-heading">{t('list.heading')}</h2>
+      <div class="toolbar">
+        <div class="chips" role="group" aria-label={t('filter.label')} data-chips>
+          <button type="button" class="chip" aria-pressed="true" data-platform="">{t('filter.all')}</button>
+        </div>
+        <label class="sort">
+          <span>{t('sort.label')}</span>
+          <select data-sort>
+            <option value="updated">{t('sort.updated')}</option>
+            <option value="name">{t('sort.name')}</option>
+            <option value="stars">{t('sort.stars')}</option>
+          </select>
+        </label>
+      </div>
+    </div>
+    <p class="notice" data-notice hidden></p>
+    <ul class="app-list" data-list>
+      {
+        apps.map((app) => (
+          <li
+            class="app-item"
+            data-slug={app.slug}
+            data-owner={app.owner}
+            data-repo={app.repo}
+            data-name={app.name}
+            data-description={app.description ?? ''}
+          >
+            <a href={localePath(lang, `/app/${app.slug}/`)}>
+              <AppIcon app={app} size={64} />
+              <div class="app-text">
+                <h3>{app.name}</h3>
+                <p class="app-desc" data-field="desc">
+                  {app.description ?? <span class="skeleton" style="width:80%" />}
+                </p>
+                <div class="app-meta" data-field="meta">
+                  <span class="skeleton" style="width:40%" />
+                </div>
+              </div>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <div class="empty" data-empty hidden>
+      <p data-empty-text></p>
+      <button type="button" class="btn btn-quiet" data-clear>{t('list.clear')}</button>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import '../scripts/home';
+</script>
