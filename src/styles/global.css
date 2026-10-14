@@ -962,3 +962,51 @@ select {
 .footer a {
   color: inherit;
 }
+
+/* Platform support for the selected version */
+.support-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin-top: 18px;
+}
+.support-label {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.support {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.support li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  font-size: 0.86rem;
+  font-weight: 550;
+}
+.support li.yes {
+  color: var(--ink);
+  background: var(--surface);
+}
+.support li.yes::before {
+  content: '✓';
+  color: var(--accent);
+  font-weight: 700;
+}
+.support li.no {
+  color: var(--muted);
+  border-style: dashed;
+  opacity: 0.7;
+}
+.support li.no::before {
+  content: '–';
+}

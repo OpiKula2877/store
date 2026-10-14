@@ -92,6 +92,17 @@ function renderPrimary(rel: Release) {
   }
 }
 
+/** Which operating systems this version ships a file for. */
+function renderSupport(rel: Release) {
+  const shipped = new Set(rel.assets.map((a) => assetPlatform(a.name)));
+  $('[data-support]').innerHTML = PLATFORMS.map((p) => {
+    const ok = shipped.has(p);
+    const missing = ok ? '' : `<span class="sr-only">${escapeHtml(t('app.supportNo'))}: </span>`;
+    return `<li class="${ok ? 'yes' : 'no'}">${missing}${escapeHtml(pname(p))}</li>`;
+  }).join('');
+  $<HTMLElement>('[data-support-row]').hidden = false;
+}
+
 function renderFiles(rel: Release) {
   const sorted = [...rel.assets].sort((a, b) => Number(isAuxiliary(a.name)) - Number(isAuxiliary(b.name)));
   const rows = sorted.map((a) => {
@@ -120,6 +131,7 @@ function renderNotes(rel: Release) {
 function selectRelease(rel: Release, updateUrl: boolean) {
   setStat('version', rel.tag_name);
   renderPrimary(rel);
+  renderSupport(rel);
   renderFiles(rel);
   renderNotes(rel);
   $('[data-side]').hidden = false;

@@ -1,6 +1,6 @@
 import { useT, type UiKey } from '../i18n/ui';
 import { GitHubError, getOwnerRepos, getReleases, latestRelease, type Repo } from '../lib/github';
-import { PLATFORMS, platformsOf, type Platform } from '../lib/platform';
+import { GROUPS, groupsOf, platformsOf, type Group, type Platform } from '../lib/platform';
 import { escapeHtml, formatNumber, formatTime } from '../lib/format';
 
 const lang = document.documentElement.lang === 'cs' ? 'cs' : 'en';
@@ -18,7 +18,7 @@ const form = search.form!;
 
 const state = {
   q: new URLSearchParams(location.search).get('q') ?? '',
-  platform: '' as Platform | '',
+  group: '' as Group | '',
   sort: 'updated',
 };
 search.value = state.q;
@@ -36,8 +36,8 @@ function apply() {
   let visible = 0;
   for (const li of items) {
     const haystack = `${li.dataset.name} ${li.dataset.search ?? ''}`.toLowerCase();
-    const platforms = (li.dataset.platforms ?? '').split(' ');
-    const show = (!q || q.split(/\s+/).every((w) => haystack.includes(w))) && (!state.platform || platforms.includes(state.platform));
+    const platforms = (li.dataset.platforms ?? '').split(' ').filter(Boolean) as Platform[];
+    const show = (!q || q.split(/\s+/).every((w) => haystack.includes(w))) && (!state.group || groupsOf(platforms).includes(state.group));
     li.hidden = !show;
     if (show) visible++;
   }
@@ -50,23 +50,23 @@ function apply() {
   list.append(...sorted);
 
   empty.hidden = visible > 0;
-  emptyText.textContent = t('list.empty', { q: state.q || t(`platform.${state.platform || 'other'}` as UiKey) });
+  emptyText.textContent = t('list.empty', { q: state.q || t(`platform.${state.group || 'other'}` as UiKey) });
 }
 
-function renderChips(available: Platform[]) {
-  for (const p of available) {
-    if (chips.querySelector(`[data-platform="${p}"]`)) continue;
+function renderChips(available: Group[]) {
+  for (const g of available) {
+    if (chips.querySelector(`[data-group="${g}"]`)) continue;
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'chip';
-    b.dataset.platform = p;
+    b.dataset.group = g;
     b.setAttribute('aria-pressed', 'false');
-    b.textContent = t(`platform.${p}` as UiKey);
+    b.textContent = t(`platform.${g}` as UiKey);
     chips.append(b);
   }
-  const order = ['', ...PLATFORMS];
+  const order = ['', ...GROUPS];
   [...chips.children]
-    .sort((a, b) => order.indexOf((a as HTMLElement).dataset.platform!) - order.indexOf((b as HTMLElement).dataset.platform!))
+    .sort((a, b) => order.indexOf((a as HTMLElement).dataset.group!) - order.indexOf((b as HTMLElement).dataset.group!))
     .forEach((el) => chips.append(el));
 }
 
@@ -134,7 +134,7 @@ async function load() {
 
   if (failed) showNotice(failed);
   else if (stale) showNotice('stale');
-  renderChips(PLATFORMS.filter((p) => found.has(p)));
+  renderChips(groupsOf([...found]));
   apply();
 }
 
@@ -151,7 +151,7 @@ search.addEventListener('input', () => {
 chips.addEventListener('click', (e) => {
   const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('.chip');
   if (!btn) return;
-  state.platform = (btn.dataset.platform ?? '') as Platform | '';
+  state.group = (btn.dataset.group ?? '') as Group | '';
   chips.querySelectorAll('.chip').forEach((c) => c.setAttribute('aria-pressed', String(c === btn)));
   apply();
 });
@@ -165,7 +165,7 @@ document.querySelector('[data-clear]')!.addEventListener('click', () => {
   state.q = '';
   search.value = '';
   search.dispatchEvent(new Event('input'));
-  chips.querySelector<HTMLButtonElement>('[data-platform=""]')!.click();
+  chips.querySelector<HTMLButtonElement>('[data-group=""]')!.click();
 });
 
 apply();

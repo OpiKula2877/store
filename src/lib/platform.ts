@@ -1,7 +1,21 @@
 import type { Asset } from './github';
 
 export type Platform = 'windows' | 'android' | 'macos' | 'linux';
-export const PLATFORMS: Platform[] = ['android', 'windows', 'macos', 'linux'];
+export const PLATFORMS: Platform[] = ['android', 'windows', 'linux', 'macos'];
+
+/** Desktop operating systems. Together they make up the "PC" filter. */
+export const DESKTOP: Platform[] = ['windows', 'linux', 'macos'];
+
+/** Visitor-facing filter groups. */
+export type Group = 'android' | 'pc';
+export const GROUPS: Group[] = ['android', 'pc'];
+
+export function groupsOf(platforms: Platform[]): Group[] {
+  const groups: Group[] = [];
+  if (platforms.includes('android')) groups.push('android');
+  if (platforms.some((p) => DESKTOP.includes(p))) groups.push('pc');
+  return groups;
+}
 
 const BY_EXTENSION: [RegExp, Platform][] = [
   [/\.(exe|msi|msix|msixbundle|appx|appxbundle)$/i, 'windows'],
