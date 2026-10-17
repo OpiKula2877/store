@@ -13,6 +13,7 @@ import {
 } from '../lib/github';
 import { PLATFORMS, assetPlatform, assetsFor, detectPlatform, isAuxiliary, type Platform } from '../lib/platform';
 import { renderMarkdown, type RepoContext } from '../lib/markdown';
+import { plainSummary } from '../lib/summary';
 import { escapeHtml, formatBytes, formatDate, formatNumber, formatTime } from '../lib/format';
 
 const lang = document.documentElement.lang === 'cs' ? 'cs' : 'en';
@@ -29,6 +30,8 @@ const userPlatform = detectPlatform();
 const declared = (root.dataset.declared ?? '').split(' ').filter(Boolean) as Platform[];
 let ctx: RepoContext = { owner, repo: repoName, branch: 'HEAD' };
 let releases: Release[] = [];
+let about = '';
+let readmeText = '';
 
 function setStat(name: string, value: string) {
   $(`[data-stat="${name}"]`).textContent = value;
@@ -46,8 +49,7 @@ function showNotice(err: unknown) {
 
 function fillRepo(repo: Repo) {
   ctx = { owner, repo: repoName, branch: repo.default_branch };
-  const desc = root.dataset.description || repo.description;
-  $('[data-field="desc"]').innerHTML = desc ? escapeHtml(desc) : `<span class="muted">${escapeHtml(t('app.noDescription'))}</span>`;
+  about = repo.description ?? '';
   setStat('stars', formatNumber(repo.stargazers_count, lang));
   setStat('updated', formatDate(repo.pushed_at, lang));
   if (repo.license && repo.license.spdx_id !== 'NOASSERTION') {
@@ -59,6 +61,14 @@ function fillRepo(repo: Repo) {
     site.href = repo.homepage;
     site.hidden = false;
   }
+}
+
+/** apps.json description, then the GitHub About text, then the start of the README. */
+function renderDesc() {
+  const text = root.dataset.description || about || readmeText;
+  $('[data-field="desc"]').innerHTML = text
+    ? escapeHtml(text)
+    : `<span class="muted">${escapeHtml(t('app.noDescription'))}</span>`;
 }
 
 function downloadButton(asset: Asset, label: string, primary: boolean) {
@@ -291,7 +301,9 @@ async function load() {
   if (repo.status === 'rejected') for (const s of ['stars', 'updated']) setStat(s, '—');
 
   if (readme.status === 'fulfilled') {
-    fillReadme(decodeBase64(readme.value.data.content), readme.value.data.path);
+    const md = decodeBase64(readme.value.data.content);
+    readmeText = plainSummary(md);
+    fillReadme(md, readme.value.data.path);
     stale ||= readme.value.stale;
   } else if (readme.reason instanceof GitHubError && readme.reason.status === 404 && repo.status === 'fulfilled') {
     fillReadme(null, '');
@@ -300,8 +312,7 @@ async function load() {
     $('[data-readme]').innerHTML = '';
   }
 
-  const desc = $('[data-field="desc"] .skeleton');
-  if (desc) desc.remove();
+  renderDesc();
 
   if (problem) showNotice(problem);
   else if (stale) showNotice('stale');

@@ -1,5 +1,6 @@
 import { useT, type UiKey } from '../i18n/ui';
-import { GitHubError, getOwnerRepos, getReleases, latestRelease, type Repo } from '../lib/github';
+import { GitHubError, decodeBase64, getOwnerRepos, getReadme, getReleases, latestRelease, type Repo } from '../lib/github';
+import { plainSummary } from '../lib/summary';
 import { GROUPS, groupsOf, mergePlatforms, platformsOf, type Group, type Platform } from '../lib/platform';
 import { escapeHtml, formatNumber, formatTime } from '../lib/format';
 
@@ -71,14 +72,20 @@ function renderChips(available: Group[]) {
 }
 
 function fillRepo(li: HTMLLIElement, repo: Repo) {
-  const desc = li.dataset.description || repo.description || '';
-  li.querySelector('[data-field="desc"]')!.innerHTML = desc
-    ? escapeHtml(desc)
-    : `<span class="muted">${escapeHtml(t('app.noDescription'))}</span>`;
-  li.dataset.search = [desc, repo.language, ...(repo.topics ?? [])].filter(Boolean).join(' ');
+  li.dataset.about = repo.description ?? '';
+  li.dataset.topics = (repo.topics ?? []).join(' ');
   li.dataset.updated = repo.pushed_at;
   li.dataset.stars = String(repo.stargazers_count);
   li.dataset.language = repo.language ?? '';
+}
+
+/** apps.json description, then the GitHub About text, then the start of the README. */
+function renderDesc(li: HTMLLIElement) {
+  const text = li.dataset.description || li.dataset.about || li.dataset.readme || '';
+  li.querySelector('[data-field="desc"]')!.innerHTML = text
+    ? escapeHtml(text)
+    : `<span class="muted">${escapeHtml(t('app.noDescription'))}</span>`;
+  li.dataset.search = [text, li.dataset.language, li.dataset.topics].filter(Boolean).join(' ');
 }
 
 function renderMeta(li: HTMLLIElement, version: string | null, platforms: Platform[]) {
@@ -131,8 +138,14 @@ async function load() {
         li.dataset.platforms = declared.join(' ');
         renderMeta(li, null, declared);
       }
-      const desc = li.querySelector('[data-field="desc"] .skeleton');
-      if (desc) desc.parentElement!.innerHTML = `<span class="muted">${escapeHtml(t('app.noDescription'))}</span>`;
+      try {
+        const { data, stale: s } = await getReadme(li.dataset.owner!, li.dataset.repo!);
+        stale ||= s;
+        li.dataset.readme = plainSummary(decodeBase64(data.content));
+      } catch {
+        // No README or no connection: the card keeps whatever it has.
+      }
+      renderDesc(li);
     }),
   );
 
