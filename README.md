@@ -20,6 +20,7 @@ Volitelná pole:
 | `description` | popis pro vyhledávače a když repo nemá „About“ popis                   |
 | `icon`        | URL ikony (jinak se vygeneruje barevná ikona s iniciálami)             |
 | `featured`    | `true` = zobrazí se jako první v horní poličce                         |
+| `shelf`       | `false` = appka se nezobrazí v horní poličce s ikonami (v seznamu „All apps“ zůstane) |
 | `platforms`   | systémy, na kterých appka běží, i když pro ně není soubor v releases (např. Linux a macOS, kde se appka sestavuje ze zdroje). Hodnoty: `windows`, `linux`, `macos`, `android` |
 
 Po pushi GitHub Action web přestaví a stránka appky se objeví i v `sitemap-index.xml`.

@@ -38,7 +38,7 @@ const jsonLd = {
   ],
 };
 
-const shelf = [...apps].sort((a, b) => Number(b.featured) - Number(a.featured));
+const shelf = apps.filter((app) => app.shelf).sort((a, b) => Number(b.featured) - Number(a.featured));
 ---
 
 <Base lang={lang} title={SITE.name} description={t('home.metaDescription')} path="/" jsonLd={jsonLd}>

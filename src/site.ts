@@ -21,6 +21,8 @@ interface AppEntry {
   /** Absolute URL of an icon image. Defaults to a generated letter icon. */
   icon?: string;
   featured?: boolean;
+  /** Show the app in the icon shelf at the top of the home page. Default true. */
+  shelf?: boolean;
   /**
    * Systems the app runs on, when they aren't all covered by release files,
    * e.g. Linux and macOS builds that are made from the source code.
@@ -37,6 +39,7 @@ export interface App {
   description?: string;
   icon?: string;
   featured: boolean;
+  shelf: boolean;
   /** Declared in apps.json, see AppEntry.platforms. */
   platforms: Platform[];
   initials: string;
@@ -85,6 +88,7 @@ export const apps: App[] = (rawApps as AppEntry[]).map((entry, index) => {
     description: entry.description,
     icon: entry.icon,
     featured: entry.featured ?? false,
+    shelf: entry.shelf ?? true,
     platforms: PLATFORMS.filter((p) => entry.platforms?.includes(p)),
     initials: initialsOf(name),
     hue: hueAt(index),
