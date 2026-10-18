@@ -92,7 +92,6 @@ function renderMeta(li: HTMLLIElement, version: string | null, platforms: Platfo
   const parts: string[] = [];
   if (version) parts.push(`<span class="tag tag-version">${escapeHtml(version)}</span>`);
   for (const p of platforms) parts.push(`<span class="tag">${escapeHtml(t(`platform.${p}` as UiKey))}</span>`);
-  if (!version && li.dataset.language) parts.push(`<span class="tag tag-quiet">${escapeHtml(li.dataset.language)}</span>`);
   const stars = Number(li.dataset.stars ?? 0);
   if (stars > 0) parts.push(`<span class="stars" aria-label="${escapeHtml(t('app.stars'))}">★ ${formatNumber(stars, lang)}</span>`);
   li.querySelector('[data-field="meta"]')!.innerHTML = parts.join('');

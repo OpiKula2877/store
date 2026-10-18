@@ -273,10 +273,6 @@ img {
   background: var(--accent-soft);
   color: var(--accent);
 }
-.tag-quiet {
-  background: none;
-  padding-inline: 0;
-}
 
 .skeleton {
   display: block;
