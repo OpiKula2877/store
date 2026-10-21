@@ -27,7 +27,7 @@ Po pushi GitHub Action web přestaví a stránka appky se objeví i v `sitemap-i
 
 ## Jak co funguje
 
-- **Releases**: tlačítko „Stáhnout“ podle zařízení návštěvníka vybere správný soubor (`.exe`/`.msi` → Windows, `.apk` → Android, `.dmg` → macOS, `.AppImage`/`.deb` → Linux). Ostatní soubory a starší verze jsou ve výběru verzí; odkaz na konkrétní verzi: `/app/<appka>/?v=v1.2.0`.
+- **Releases**: tlačítko „Stáhnout“ podle zařízení návštěvníka vybere správný soubor (`.exe`/`.msi` → Windows, `.apk` → Android, `.dmg` → macOS, `.AppImage`/`.deb` → Linux). Soubor bez označení systému v názvu (např. `.zip` webové verze) se nabídne jako obecné „Stáhnout“. Ostatní soubory a starší verze jsou ve výběru verzí; odkaz na konkrétní verzi: `/app/<appka>/?v=v1.2.0`.
 - **Filtr** na úvodní stránce má dvě skupiny: **Android** a **PC** (Windows, Linux, macOS).
 - **Podpora**: na detailu aplikace je u zvolené verze přehled Android / Windows / Linux / macOS. Platforma je podporovaná, pokud má verze v releases soubor pro ni, nebo je uvedená v poli `platforms` (pak je označená „ze zdroje“).
 - **Screenshoty** se berou z obrázků v README (bez badge odznaků).

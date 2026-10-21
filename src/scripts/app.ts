@@ -82,12 +82,16 @@ function renderPrimary(rel: Release) {
   hint.hidden = true;
 
   const downloadable = rel.assets.filter((a) => !isAuxiliary(a.name));
+  // Files not tied to one system (e.g. a web app's zip) are for everyone.
+  const universal = downloadable.filter((a) => assetPlatform(a.name) === null);
   const mine = userPlatform ? assetsFor(rel.assets, userPlatform) : [];
 
   if (mine.length === 1) {
     box.innerHTML = downloadButton(mine[0], t('app.downloadFor', { platform: pname(userPlatform!) }), true);
   } else if (mine.length > 1) {
     box.innerHTML = mine.slice(0, 4).map((a, i) => downloadButton(a, a.name, i === 0)).join('');
+  } else if (universal.length) {
+    box.innerHTML = universal.slice(0, 3).map((a, i) => downloadButton(a, i === 0 ? t('app.download') : a.name, i === 0)).join('');
   } else {
     const perPlatform = PLATFORMS.map((p) => [p, assetsFor(rel.assets, p)[0]] as const).filter(([, a]) => a);
     if (perPlatform.length) {
