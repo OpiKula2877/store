@@ -6,5 +6,5 @@
   { "repo": "https://github.com/OpiKula2877/BubbleVerse" },
   { "repo": "https://github.com/OpiKula2877/Batch-Hra", "platforms": ["windows"] },
   { "repo": "https://github.com/OpiKula2877/Lovec-znamek", "name": "Lovec známek", "shelf": false },
-  { "repo": "https://github.com/OpiKula2877/letackomat", "name": "Letáčkomat" }
+  { "repo": "https://github.com/OpiKula2877/letackomat", "name": "Letáčkomat", "shelf": false }
 ]

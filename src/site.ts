@@ -96,6 +96,13 @@ export const apps: App[] = (rawApps as AppEntry[]).map((entry, index) => {
   };
 });
 
+/** The icon shelf on the home page holds at most this many apps. */
+const SHELF_MAX = 6;
+const onShelf = apps.filter((app) => app.shelf).length;
+if (onShelf > SHELF_MAX) {
+  throw new Error(`apps.json: ${onShelf} apps are on the shelf, the maximum is ${SHELF_MAX}. Set "shelf": false on some.`);
+}
+
 const slugs = new Set<string>();
 for (const app of apps) {
   if (slugs.has(app.slug)) throw new Error(`apps.json: duplicate app "${app.slug}"`);
