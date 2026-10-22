@@ -43,6 +43,28 @@
   box-sizing: border-box;
 }
 
+/* Scrollbars: thin and in the page colours, vertical and horizontal.
+   scrollbar-width is not inherited, so it's set on every element. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--muted) 45%, transparent) transparent;
+}
+@supports not (scrollbar-color: auto) {
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track,
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--muted) 45%, transparent);
+    border-radius: 999px;
+    border: 3px solid var(--bg);
+  }
+}
+
 html {
   -webkit-text-size-adjust: 100%;
 }
