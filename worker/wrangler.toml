@@ -1,0 +1,6 @@
+# Serves https://store-api.opikula.dev (the zone opikula.dev already lives on Cloudflare).
+name = "store-api"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+
+routes = [{ pattern = "store-api.opikula.dev", custom_domain = true }]

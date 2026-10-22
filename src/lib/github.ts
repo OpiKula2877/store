@@ -1,10 +1,11 @@
-// Browser-side GitHub API client. Anonymous requests are limited to 60 per hour
-// per IP, so responses are kept in localStorage: within TTL they are served
-// without a request, after that they are revalidated with If-None-Match
-// (a 304 doesn't count against the limit). When GitHub can't be reached or the
-// limit is hit, the last saved copy is returned with `stale: true`.
+// Browser-side GitHub API client. Requests go to the store's Cloudflare Worker
+// (see worker/), which caches GitHub's answers and holds the token, so visitors
+// don't use up GitHub's anonymous limit of 60 per hour per IP. Responses are
+// also kept in localStorage: within TTL they are served without a request, after
+// that they are revalidated with If-None-Match (a 304 is free). When the API can't
+// be reached or the limit is hit, the last saved copy is returned with `stale: true`.
 
-const API = 'https://api.github.com';
+const API = import.meta.env.PUBLIC_STORE_API ?? 'https://store-api.opikula.dev/gh';
 const TTL = 10 * 60 * 1000;
 const PREFIX = 'gh1:';
 

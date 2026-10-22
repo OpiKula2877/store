@@ -34,6 +34,19 @@ Po pushi GitHub Action web přestaví a stránka appky se objeví i v `sitemap-i
 - **Popis** se bere z pole „About“ repozitáře na GitHubu.
 - Data se načítají přímo v prohlížeči z GitHub API a ukládají se na 10 minut do `localStorage` (anonymní limit je 60 požadavků/h na IP).
 
+## Cloudflare Worker (cache pro GitHub API)
+
+Web nevolá GitHub přímo. Volá Worker na `store-api.opikula.dev` ([`worker/`](worker/)), který odpovědi drží v cache 5 minut a používá read-only token. Návštěvníci tak nevyčerpávají anonymní limit 60 požadavků za hodinu na IP.
+
+```bash
+cd worker
+npm install
+npx wrangler deploy        # nasazení; přihlášení přes npx wrangler login
+npx wrangler secret put GITHUB_TOKEN   # read-only token (Public repositories, bez permisí)
+```
+
+Lokálně: `npx wrangler dev` ve složce `worker` a `PUBLIC_STORE_API=http://127.0.0.1:8787/gh npm run dev`.
+
 ## Vývoj
 
 ```bash
