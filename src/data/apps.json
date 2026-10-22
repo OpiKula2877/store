@@ -1,11 +1,11 @@
 [
-  { "repo": "https://github.com/OpiKula2877/Advanced-Player", "featured": true },
+  { "repo": "https://github.com/OpiKula2877/Advanced-Player", "featured": true, "icon": "/icons/advanced-player.png" },
   { "repo": "https://github.com/OpiKula2877/Financer" },
   { "repo": "https://github.com/OpiKula2877/Sprava-prodeje" },
-  { "repo": "https://github.com/OpiKula2877/Apps", "platforms": ["windows", "linux", "macos"] },
-  { "repo": "https://github.com/OpiKula2877/BubbleVerse" },
+  { "repo": "https://github.com/OpiKula2877/Apps", "platforms": ["windows", "linux", "macos"], "icon": "/icons/apps.png" },
+  { "repo": "https://github.com/OpiKula2877/BubbleVerse", "icon": "/icons/bubbleverse.svg" },
   { "repo": "https://github.com/OpiKula2877/Batch-Hra", "platforms": ["windows"] },
-  { "repo": "https://github.com/OpiKula2877/Lovec-znamek", "name": "Lovec známek", "shelf": false },
-  { "repo": "https://github.com/OpiKula2877/letackomat", "name": "Letáčkomat", "shelf": false },
+  { "repo": "https://github.com/OpiKula2877/Lovec-znamek", "name": "Lovec známek", "icon": "/icons/lovec-znamek.png", "shelf": false },
+  { "repo": "https://github.com/OpiKula2877/letackomat", "name": "Letáčkomat", "icon": "/icons/letackomat.png", "shelf": false },
   { "repo": "https://github.com/OpiKula2877/srvMC", "icon": "/icons/srvmc.png", "shelf": false }
 ]
