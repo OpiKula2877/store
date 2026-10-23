@@ -115,8 +115,10 @@ function renderPrimary(rel: Release) {
 /** Per OS: a file in this version, supported but only from source, or not supported. */
 function renderSupport(rel: Release) {
   const shipped = new Set(rel.assets.map((a) => assetPlatform(a.name)));
+  // A file that doesn't name a system (e.g. a web app's zip) works for every declared platform.
+  const universalFile = rel.assets.some((a) => !isAuxiliary(a.name) && assetPlatform(a.name) === null);
   $('[data-support]').innerHTML = PLATFORMS.map((p) => {
-    if (shipped.has(p)) return `<li class="yes">${escapeHtml(pname(p))}</li>`;
+    if (shipped.has(p) || (universalFile && declared.includes(p))) return `<li class="yes">${escapeHtml(pname(p))}</li>`;
     if (declared.includes(p)) {
       return `<li class="source">${escapeHtml(pname(p))} <small>${escapeHtml(t('app.fromSource'))}</small></li>`;
     }
