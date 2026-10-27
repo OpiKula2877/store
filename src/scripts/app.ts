@@ -116,13 +116,19 @@ function versionOptions(selected: string) {
     .join('');
 }
 
-/** What a row offers for its system in one release: a download, a build from source, or nothing. */
+/** Source code of a release as GitHub's own archive for that tag, e.g. .../archive/refs/tags/v1.1.0.zip. */
+function sourceUrl(rel: Release, ext: 'zip' | 'tar.gz') {
+  return `https://github.com/${owner}/${repoName}/archive/refs/tags/${encodeURIComponent(rel.tag_name)}.${ext}`;
+}
+
+/** What a row offers for its system in one release: a download, the source code, or nothing. */
 function actionFor(p: Platform, rel: Release, primary: boolean): string {
   const file = fileFor(rel, p);
   if (file) return downloadButton(file, t('app.download'), primary);
   if (declared.includes(p)) {
-    const repoUrl = `https://github.com/${owner}/${repoName}`;
-    return `<span class="muted">${escapeHtml(t('app.fromSource'))}</span> <a class="dl-link" href="${escapeHtml(repoUrl)}" target="_blank" rel="noopener">${escapeHtml(t('app.viewSource'))}</a>`;
+    return `<span class="muted">${escapeHtml(t('app.fromSource'))}</span>
+      <a class="btn btn-secondary" href="${escapeHtml(sourceUrl(rel, 'zip'))}" download><span>${escapeHtml(t('app.sourceZip'))}</span></a>
+      <a class="btn btn-quiet" href="${escapeHtml(sourceUrl(rel, 'tar.gz'))}" download><span>${escapeHtml(t('app.sourceTar'))}</span></a>`;
   }
   return `<span class="muted">${escapeHtml(t('app.supportNo'))}</span>`;
 }
@@ -169,8 +175,8 @@ function renderFiles(rel: Release) {
       <span>↓ ${formatNumber(a.download_count, lang)}</span></span></li>`;
   });
   rows.push(
-    `<li class="aux"><a href="${escapeHtml(rel.zipball_url)}">${escapeHtml(t('app.sourceZip'))}</a></li>`,
-    `<li class="aux"><a href="${escapeHtml(rel.tarball_url)}">${escapeHtml(t('app.sourceTar'))}</a></li>`,
+    `<li class="aux"><a href="${escapeHtml(sourceUrl(rel, 'zip'))}">${escapeHtml(t('app.sourceZip'))}</a></li>`,
+    `<li class="aux"><a href="${escapeHtml(sourceUrl(rel, 'tar.gz'))}">${escapeHtml(t('app.sourceTar'))}</a></li>`,
   );
   $('[data-files]').innerHTML = rows.join('');
 }

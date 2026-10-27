@@ -695,9 +695,13 @@ select {
   gap: 48px;
   margin-top: 36px;
 }
+/* Grid items may shrink below their content, so wide tables scroll inside instead of widening the page. */
+.detail-body > * {
+  min-width: 0;
+}
 @media (max-width: 900px) {
   .detail-body {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .detail-side {
     order: -1;
@@ -812,7 +816,10 @@ select {
 }
 
 /* Rendered markdown */
+/* Text size follows the viewport: about 30% smaller on phones, full size on desktop. */
 .prose {
+  --prose-size: clamp(0.7rem, 0.62rem + 0.4vw, 1rem);
+  font-size: var(--prose-size);
   max-width: 72ch;
   overflow-wrap: anywhere;
 }
@@ -827,13 +834,13 @@ select {
   letter-spacing: -0.015em;
 }
 .prose h1 {
-  font-size: 1.7rem;
+  font-size: 1.6em;
 }
 .prose h2 {
-  font-size: 1.35rem;
+  font-size: 1.35em;
 }
 .prose h3 {
-  font-size: 1.12rem;
+  font-size: 1.12em;
 }
 .prose p,
 .prose ul,
@@ -889,12 +896,12 @@ select {
   margin: 2em 0;
 }
 .prose-small {
-  font-size: 0.93rem;
+  font-size: calc(var(--prose-size) * 0.92);
 }
 .prose-small h1,
 .prose-small h2,
 .prose-small h3 {
-  font-size: 1rem;
+  font-size: 1em;
   margin-top: 1.2em;
 }
 .prose .skeleton {
