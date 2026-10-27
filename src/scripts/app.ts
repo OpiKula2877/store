@@ -11,7 +11,16 @@ import {
   type Release,
   type Repo,
 } from '../lib/github';
-import { PLATFORMS, assetPlatform, assetsFor, detectPlatform, isAuxiliary, type Platform } from '../lib/platform';
+import {
+  PLATFORMS,
+  assetPlatform,
+  assetsFor,
+  detectPlatform,
+  isAuxiliary,
+  mergePlatforms,
+  platformsOf,
+  type Platform,
+} from '../lib/platform';
 import { renderMarkdown, type RepoContext } from '../lib/markdown';
 import { plainSummary } from '../lib/summary';
 import { escapeHtml, formatBytes, formatDate, formatNumber, formatTime } from '../lib/format';
@@ -76,40 +85,62 @@ function downloadButton(asset: Asset, label: string, primary: boolean) {
     <span>${escapeHtml(label)}</span><small>${escapeHtml(formatBytes(asset.size, lang))}</small></a>`;
 }
 
-function renderPrimary(rel: Release) {
-  const box = $('[data-primary]');
-  const hint = $('[data-hint]');
-  hint.hidden = true;
+/** Platform rows in display order: the visitor's own system first (Android on a phone, Windows on a PC). */
+function rowOrder(): Platform[] {
+  return userPlatform ? [userPlatform, ...PLATFORMS.filter((p) => p !== userPlatform)] : [...PLATFORMS];
+}
 
-  const downloadable = rel.assets.filter((a) => !isAuxiliary(a.name));
-  // Files not tied to one system (e.g. a web app's zip) are for everyone.
-  const universal = downloadable.filter((a) => assetPlatform(a.name) === null);
-  const mine = userPlatform ? assetsFor(rel.assets, userPlatform) : [];
+/** Systems this app has a file for in any release, or that are declared in apps.json. */
+function appPlatforms(): Platform[] {
+  const seen = mergePlatforms(...releases.map((r) => platformsOf(r.assets)), declared);
+  return rowOrder().filter((p) => seen.includes(p));
+}
 
-  if (mine.length === 1) {
-    box.innerHTML = downloadButton(mine[0], t('app.downloadFor', { platform: pname(userPlatform!) }), true);
-  } else if (mine.length > 1) {
-    box.innerHTML = mine.slice(0, 4).map((a, i) => downloadButton(a, a.name, i === 0)).join('');
-  } else if (universal.length) {
-    box.innerHTML = universal.slice(0, 3).map((a, i) => downloadButton(a, i === 0 ? t('app.download') : a.name, i === 0)).join('');
-  } else {
-    const perPlatform = PLATFORMS.map((p) => [p, assetsFor(rel.assets, p)[0]] as const).filter(([, a]) => a);
-    if (perPlatform.length) {
-      box.innerHTML = perPlatform.map(([p, a], i) => downloadButton(a!, t('app.downloadFor', { platform: pname(p) }), i === 0)).join('');
-    } else if (downloadable.length) {
-      box.innerHTML = downloadable.slice(0, 3).map((a, i) => downloadButton(a, a.name, i === 0)).join('');
-    } else {
-      box.innerHTML = `<a class="btn btn-primary" href="${escapeHtml(rel.zipball_url)}"><span>${escapeHtml(t('app.sourceZip'))}</span></a>`;
-    }
-    if (userPlatform && declared.includes(userPlatform)) {
-      const repoUrl = `https://github.com/${owner}/${repoName}`;
-      hint.innerHTML = `${escapeHtml(t('app.buildHint', { platform: pname(userPlatform) }))} <a href="${escapeHtml(repoUrl)}" target="_blank" rel="noopener">${escapeHtml(t('app.viewSource'))}</a>`;
-      hint.hidden = false;
-    } else if (userPlatform && downloadable.length) {
-      hint.textContent = t('app.noMatch', { platform: pname(userPlatform) });
-      hint.hidden = false;
-    }
+/** The file offered for a system in a release: its own file, else one that works everywhere. */
+function fileFor(rel: Release, p: Platform): Asset | undefined {
+  return assetsFor(rel.assets, p)[0] ?? rel.assets.find((a) => !isAuxiliary(a.name) && assetPlatform(a.name) === null);
+}
+
+function releaseByTag(tag: string): Release {
+  return releases.find((r) => r.tag_name === tag) ?? releases[0];
+}
+
+function versionOptions(selected: string) {
+  const latest = latestRelease(releases);
+  return releases
+    .map((r) => {
+      const tags = [r === latest ? t('app.latest') : '', r.prerelease ? t('app.prerelease') : ''].filter(Boolean);
+      const label = `${r.tag_name}${tags.length ? ` (${tags.join(', ')})` : ''}`;
+      return `<option value="${escapeHtml(r.tag_name)}"${r.tag_name === selected ? ' selected' : ''}>${escapeHtml(label)}</option>`;
+    })
+    .join('');
+}
+
+/** What a row offers for its system in one release: a download, a build from source, or nothing. */
+function actionFor(p: Platform, rel: Release, primary: boolean): string {
+  const file = fileFor(rel, p);
+  if (file) return downloadButton(file, t('app.download'), primary);
+  if (declared.includes(p)) {
+    const repoUrl = `https://github.com/${owner}/${repoName}`;
+    return `<span class="muted">${escapeHtml(t('app.fromSource'))}</span> <a class="dl-link" href="${escapeHtml(repoUrl)}" target="_blank" rel="noopener">${escapeHtml(t('app.viewSource'))}</a>`;
   }
+  return `<span class="muted">${escapeHtml(t('app.supportNo'))}</span>`;
+}
+
+/** One row per system; each row has its own version picker, starting at `tag`. */
+function renderDownloads(tag: string) {
+  const box = $('[data-downloads]');
+  const platforms = appPlatforms();
+  box.innerHTML = platforms
+    .map(
+      (p, i) => `<div class="download-row" data-platform="${p}">
+        <span class="dl-name">${escapeHtml(pname(p))}</span>
+        <select class="dl-version" aria-label="${escapeHtml(`${pname(p)}: ${t('app.chooseVersion')}`)}">${versionOptions(tag)}</select>
+        <div class="dl-action">${actionFor(p, releaseByTag(tag), i === 0)}</div>
+      </div>`,
+    )
+    .join('');
+  box.hidden = platforms.length === 0;
 }
 
 /** Per OS: a file in this version, supported but only from source, or not supported. */
@@ -154,7 +185,7 @@ function renderNotes(rel: Release) {
 
 function selectRelease(rel: Release, updateUrl: boolean) {
   setStat('version', rel.tag_name);
-  renderPrimary(rel);
+  renderDownloads(rel.tag_name);
   renderSupport(rel);
   renderFiles(rel);
   renderNotes(rel);
@@ -174,7 +205,8 @@ function fillReleases(all: Release[]) {
 
   if (!releases.length) {
     setStat('version', '—');
-    $('[data-primary]').innerHTML = `<a class="btn btn-primary" href="https://github.com/${owner}/${repoName}" target="_blank" rel="noopener"><span>${escapeHtml(t('app.viewSource'))}</span></a>`;
+    $('[data-downloads]').innerHTML = `<a class="btn btn-primary" href="https://github.com/${owner}/${repoName}" target="_blank" rel="noopener"><span>${escapeHtml(t('app.viewSource'))}</span></a>`;
+    $('[data-downloads]').hidden = false;
     const hint = $('[data-hint]');
     hint.textContent = t('app.noReleases');
     hint.hidden = false;
@@ -184,18 +216,11 @@ function fillReleases(all: Release[]) {
 
   const latest = latestRelease(releases)!;
   const select = $<HTMLSelectElement>('[data-version]');
-  select.innerHTML = releases
-    .map((r) => {
-      const tags = [r === latest ? t('app.latest') : '', r.prerelease ? t('app.prerelease') : ''].filter(Boolean);
-      const label = `${r.tag_name}${tags.length ? ` (${tags.join(', ')})` : ''}`;
-      return `<option value="${escapeHtml(r.tag_name)}">${escapeHtml(label)}</option>`;
-    })
-    .join('');
-  $('[data-version-wrap]').hidden = false;
-
   const wanted = new URLSearchParams(location.search).get('v');
   const initial = releases.find((r) => r.tag_name === wanted) ?? latest;
-  select.value = initial.tag_name;
+  select.innerHTML = versionOptions(initial.tag_name);
+  $('[data-version-wrap]').hidden = false;
+
   selectRelease(initial, false);
   select.addEventListener('change', () => selectRelease(releases.find((r) => r.tag_name === select.value)!, true));
 
@@ -211,6 +236,15 @@ function fillReleases(all: Release[]) {
     )
     .join('');
 }
+
+// Each row's own version picker only changes that row.
+$('[data-downloads]').addEventListener('change', (e) => {
+  const select = e.target as HTMLSelectElement;
+  if (!select.classList.contains('dl-version')) return;
+  const row = select.closest<HTMLElement>('.download-row')!;
+  const primary = row === row.parentElement!.firstElementChild;
+  row.querySelector('.dl-action')!.innerHTML = actionFor(row.dataset.platform as Platform, releaseByTag(select.value), primary);
+});
 
 let shots: string[] = [];
 function fillReadme(md: string | null, path: string) {

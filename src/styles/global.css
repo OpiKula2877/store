@@ -1042,3 +1042,46 @@ select {
 .support li.no::before {
   content: '–';
 }
+
+/* One row per platform, each with its own version picker */
+.downloads {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+.download-row {
+  display: grid;
+  grid-template-columns: minmax(90px, auto) minmax(140px, 200px) minmax(0, 1fr);
+  align-items: center;
+  gap: 10px 14px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-m);
+}
+.dl-name {
+  font-weight: 650;
+}
+.dl-version {
+  min-height: 44px;
+  min-width: 0;
+  width: 100%;
+}
+.dl-action {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  font-size: 0.92rem;
+}
+.dl-link {
+  font-weight: 600;
+}
+@media (max-width: 560px) {
+  .download-row {
+    grid-template-columns: 1fr 1fr;
+  }
+  .dl-action {
+    grid-column: 1 / -1;
+  }
+}
