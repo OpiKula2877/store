@@ -1,13 +1,13 @@
 [
-  { "repo": "https://github.com/OpiKula2877/Advanced-Player", "featured": true, "icon": "/icons/advanced-player.png" },
+  { "repo": "https://github.com/OpiKula2877/srvMC", "icon": "/icons/srvmc.png" },
   { "repo": "https://github.com/OpiKula2877/Financer", "icon": "/icons/financer.png" },
-  { "repo": "https://github.com/OpiKula2877/Sprava-prodeje", "icon": "/icons/sprava-prodeje.png" },
-  { "repo": "https://github.com/OpiKula2877/BubbleVerse", "icon": "/icons/bubbleverse.svg" },
-  { "repo": "https://github.com/OpiKula2877/Batch-Hra", "platforms": ["windows"], "icon": "/icons/batch-hra.png" },
+  { "repo": "https://github.com/OpiKula2877/Advanced-Player", "icon": "/icons/advanced-player.png" },
+  { "repo": "https://github.com/OpiKula2877/letackomat", "name": "Letáčkomat", "platforms": ["windows"], "icon": "/icons/letackomat.png" },
+  { "repo": "https://github.com/OpiKula2877/OKpass", "platforms": ["windows", "linux", "macos"], "icon": "/icons/okapps.png" },
+  { "repo": "https://github.com/OpiKula2877/OKfetch", "platforms": ["windows", "linux", "macos"], "icon": "/icons/okapps.png" },
+  { "repo": "https://github.com/OpiKula2877/Sprava-prodeje", "icon": "/icons/sprava-prodeje.png", "shelf": false },
+  { "repo": "https://github.com/OpiKula2877/BubbleVerse", "icon": "/icons/bubbleverse.svg", "shelf": false },
+  { "repo": "https://github.com/OpiKula2877/Batch-Hra", "platforms": ["windows"], "icon": "/icons/batch-hra.png", "shelf": false },
   { "repo": "https://github.com/OpiKula2877/Lovec-znamek", "name": "Lovec známek", "icon": "/icons/lovec-znamek.png", "shelf": false },
-  { "repo": "https://github.com/OpiKula2877/letackomat", "name": "Letáčkomat", "platforms": ["windows"], "icon": "/icons/letackomat.png", "shelf": false },
-  { "repo": "https://github.com/OpiKula2877/srvMC", "icon": "/icons/srvmc.png", "shelf": false },
-  { "repo": "https://github.com/OpiKula2877/OKgram", "platforms": ["windows", "linux", "macos"], "shelf": false },
-  { "repo": "https://github.com/OpiKula2877/OKpass", "platforms": ["windows", "linux", "macos"], "shelf": false },
-  { "repo": "https://github.com/OpiKula2877/OKfetch", "platforms": ["windows", "linux", "macos"], "shelf": false }
+  { "repo": "https://github.com/OpiKula2877/OKgram", "platforms": ["windows", "linux", "macos"], "icon": "/icons/okapps.png", "shelf": false }
 ]
