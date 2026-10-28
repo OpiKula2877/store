@@ -9,5 +9,6 @@
   { "repo": "https://github.com/OpiKula2877/BubbleVerse", "icon": "/icons/bubbleverse.svg", "shelf": false },
   { "repo": "https://github.com/OpiKula2877/Batch-Hra", "platforms": ["windows"], "icon": "/icons/batch-hra.png", "shelf": false },
   { "repo": "https://github.com/OpiKula2877/Lovec-znamek", "name": "Lovec známek", "icon": "/icons/lovec-znamek.png", "shelf": false },
-  { "repo": "https://github.com/OpiKula2877/OKgram", "platforms": ["windows", "linux", "macos"], "icon": "/icons/okapps.png", "shelf": false }
+  { "repo": "https://github.com/OpiKula2877/OKgram", "platforms": ["windows", "linux", "macos"], "icon": "/icons/okapps.png", "shelf": false },
+  { "repo": "https://github.com/OpiKula2877/Pripominak", "platforms": ["android"], "shelf": false }
 ]
